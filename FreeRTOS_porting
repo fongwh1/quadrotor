@@ -1,0 +1,27 @@
+goal:在原來作業的環境上編譯出在stm32f4xx的freeRTOS檔案
+原來在qemu上跑的是stm32p103的環境, 所以要使用stm32f4的firmware.
+
+	firmware: STM32F4-Discovery_FW_V1.1.0(link)
+
+	
+
+	關於Firmware的path:
+	cp STM32F4xx_StdPeriph_Driver quadrotor/freertos/libraries/
+	cp stm32f4_fw/Libraries/CMSIS/ST/STM32F4xx/ quadrotor/freertos/libraries/CMSIS/CM3/DeviceSupport/ST
+
+	可以從STM32F4-Discovery_FW_V1.1.0的project裡的periphral_example裡找到stm32f4xx_conf.h;
+
+	在STM32F4-Discovery_FW_V1.1.0/Libraries/CMSIS/ 把Include, Lib 移到相應位置, 裡面有core_m4.h/core_m4.c用得上.
+
+	***目前瓶頸在於:根據 Desent Sung的blog, stm32f10x 跟 stm32f4xx 的 IO 是不相容的, qemu用的是stm32f10x的firmware, 所以init GPIO, UART這些都不能用,
+	freertos一開始需要的init都應該要重寫; 目前compile 出來就說, 這些參數都沒有宣告, 所以找不到.
+
+	to-do: 參考Hom的test code, 重寫init的部份, 把.bin 燒進 飛控板.
+
+	關於freeRTOS的path:
+	(基本上沒有動)
+
+	在Makefile裡用stm32f4xx取代stm32f10x;
+	加入 有 core_m4.h/.c 的path;
+	修改一些path;
+	
