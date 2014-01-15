@@ -26,7 +26,8 @@ C_LIB= $(TOOLCHAIN_PATH)/lib/thumb2
 CFLAGS=-g -mlittle-endian -mthumb
 CFLAGS+=-mcpu=cortex-m4
 CFLAGS+=-mfpu=fpv4-sp-d16 -mfloat-abi=softfp
-CFLAGS+=-ffreestanding -nostdlib -Wall
+CFLAGS+=-ffreestanding -nostdlib
+#CFLAGS+=-Wall -Wno-unused-function
 
 #Flash
 CFLAGS+=-Wl,-T,stm32.ld
@@ -61,8 +62,8 @@ LDFLAGS += -lm -lc -lgcc
 SRC=$(wildcard ./Libraries/CMSIS/*.c)
 #STM32F4xx Peripherys source code
 #SRC+=$(wildcard ./Libraries/STM32F4xx_StdPeriph_Driver/src/*.c)
-SRC+= ./Libraries/CMSIS/system_stm32f4xx.c \
-	$(ST_LIB)/src/misc.c \
+#SRC+= ./Libraries/CMSIS/system_stm32f4xx.c 
+SRC+= $(ST_LIB)/src/misc.c \
 	$(ST_LIB)/src/stm32f4xx_rcc.c \
 	$(ST_LIB)/src/stm32f4xx_dma.c \
 	$(ST_LIB)/src/stm32f4xx_flash.c \
@@ -84,20 +85,25 @@ SRC += 	$(FREERTOS)/tasks.c \
 	
 
 #Major programs source code
-SRC += $(PROGRAM_ALG)/algorithm_*.c \
-		$(PROGRAM_DIR)/stm32f4_*.c \
-		$(PROGRAM_MOD)/module_*.c \
-		$(PROGRAM_SYS)/QCopterFC_*.c \
-		$(PROGRAM_SYS)/QCopterFC.c \
+SRC +=  $(wildcard $(PROGRAM_ALG)/algorithm_*.c) \
+		$(wildcard $(PROGRAM_DIR)/stm32f4_*.c) \
+		$(wildcard $(PROGRAM_MOD)/module_*.c) \
+		$(wildcard $(PROGRAM_SYS)/QCopterFC_*.c) \
+		$(wildcard $(PROGRAM_SYS)/QCopterFC.c) \
 		Libraries/CMSIS/FastMathFunctions/arm_cos_f32.c \
 		Libraries/CMSIS/FastMathFunctions/arm_sin_f32.c \
+		sensor.c \
+		pwm.c \
+		usartIO.c \
+		string-util.c \
+		shell.c \
 		main.c
 
-INC_HEADERS =	$(PROGRAM_ALG)/*.h \
-		$(PROGRAM_DIR)/*.h \
-		$(PROGRAM_MOD)/*.h \
-		$(PROGRAM_SYS)/*.h \
-		*.h
+INC_HEADERS =	$(wildcard $(PROGRAM_ALG)/*.h) \
+		$(wildcard $(PROGRAM_DIR)/*.h) \
+		$(wildcard $(PROGRAM_MOD)/*.h) \
+		$(wildcard $(PROGRAM_SYS)/*.h) \
+		$(wildcard *.h)
 
 
 
@@ -117,7 +123,7 @@ $(STARTUP_OBJ): $(STARTUP)
 	$(CC) $(CFLAGS) $^ -c $(STARTUP)
 
 $(EXECUTABLE):$(SRC) $(STARTUP_OBJ) ${INC_HEADERS}
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(SRC) $(STARTUP_OBJ) -o $@ $(LDFLAGS)
 
 #Make clean
 clean:

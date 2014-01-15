@@ -1,10 +1,8 @@
-/* Scheduler includes. */
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
-
 
 #include "stm32f4_system.h"
 #include "stm32f4_delay.h"
@@ -18,31 +16,33 @@
 #include "module_sensor.h"
 #include "module_nrf24l01.h"
 
+/* Shell includes */
+#include "shell.h"
+#include "usartIO.h"
+#include "sensor.h"
+#include "pwm.h"
+
 int main( void )
 {
-  u8 Sta = ERROR;
-  FSM_Mode FSM_State = FSM_Rx;
+	/* System Init */
+	System_Init();
+	
+	USARTIO_Init();
 
-  /* System Init */
-  System_Init();
+	LED_G = (Sensor_Init() == SUCCESS) ? 0 : 1;
+	Delay_10ms(100);
 
+	xTaskCreate(sensor_task,
+			   (signed portCHAR *) "Collecting data from sensors",
+			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
 
+	/*Create a task*/
+	xTaskCreate(user_shell,
+			   (signed portCHAR *) "User Shell",
+			   512 /*stack size*/, NULL, tskIDLE_PRIORITY + 2, NULL);
 
-  /* Lock */
-  LED_R = 1;
-  LED_G = 0;
-  LED_B = 1;
+	/*Start running the tasks.*/
+	vTaskStartScheduler();
 
-  /* Final State Machine */
-  while(1) {
-	LED_G = ~LED_G; 
-	LED_B = ~LED_B;
-	LED_R = ~LED_R;
-
-	Delay_100ms(10);	
-
-  }
 	return 0;
 }
-/*=====================================================================================================*/
-/*=====================================================================================================*/

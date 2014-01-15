@@ -1,5 +1,5 @@
 /* #include "module_ak8975.h" */
-
+// "terrestrial magnetism" in the X-axis, Y-axis, and Z-axis
 #ifndef __MODULE_AK8975_H
 #define __MODULE_AK8975_H
 
